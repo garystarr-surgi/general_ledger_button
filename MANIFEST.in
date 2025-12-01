@@ -1,0 +1,4 @@
+include MANIFEST.in
+include setup.py
+include apps.txt
+recursive-include general_ledger_button *.py *.json *.html *.css *.js
