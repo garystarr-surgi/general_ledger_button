@@ -9,5 +9,5 @@ app_email = "gary.starr@surgishop.com"
 app_license = "MIT"
 
 app_include_js = [
-    "general_ledger_button/public/js/surgi_general_ledger.js"
+    "general_ledger_button/js/surgi_general_ledger.js"
 ]
