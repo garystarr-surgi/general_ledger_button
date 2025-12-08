@@ -1,0 +1,17 @@
+{
+ "allow_rename": 1,
+ "creation": "2025-01-27 00:00:00.000000",
+ "doctype": "Report",
+ "filters": [],
+ "is_standard": "No",
+ "json": "",
+ "modified": "2025-01-27 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Accounts",
+ "name": "Surgi General Ledger",
+ "owner": "Administrator",
+ "query": "SELECT\n    gle.posting_date AS posting_date,\n    CONCAT(gle.voucher_type, ' ', gle.voucher_no) AS description,\n    gle.debit AS debit,\n    gle.credit AS credit,\n    (gle.debit - gle.credit) AS amount\nFROM `tabGL Entry` gle\nWHERE\n    gle.is_cancelled = 0\n    AND gle.party_type = 'Customer'\n    AND gle.posting_date BETWEEN %(from_date)s AND %(to_date)s\n    AND (%(customer)s IS NULL OR gle.party = %(customer)s)\nORDER BY gle.posting_date ASC, gle.creation ASC",
+ "report_name": "Surgi General Ledger",
+ "report_type": "Query Report",
+ "roles": []
+}
