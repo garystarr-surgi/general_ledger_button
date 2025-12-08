@@ -8,7 +8,6 @@ app_color = "grey"
 app_email = "gary.starr@surgishop.com"
 app_license = "MIT"
 
-# Include report JS globally as fallback
 app_include_js = [
-    "general_ledger_button/report/surgi_general_ledger/surgi_general_ledger.js"
+    "/assets/general_ledger_button/js/surgi_general_ledger.js"
 ]
