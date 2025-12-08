@@ -1,4 +1,3 @@
-# surgi_general_ledger.py
 import frappe
 from frappe import _
 
@@ -6,20 +5,15 @@ def execute(filters=None):
     """
     Execute function for Surgi General Ledger Report
     """
-    # Ensure filters is a dictionary
     if not filters:
         filters = {}
     
-    # Get filter values
     from_date = filters.get('from_date')
     to_date = filters.get('to_date')
-    customer = filters.get('customer')
     
-    # Validate required filters
     if not from_date or not to_date:
         frappe.throw(_("Please select From Date and To Date"))
     
-    # Get columns and data
     columns = get_columns()
     data = get_data(filters)
     
@@ -66,13 +60,11 @@ def get_data(filters):
     """
     Fetch report data
     """
-    # Build WHERE conditions
     params = {
         'from_date': filters.get('from_date'),
         'to_date': filters.get('to_date')
     }
     
-    # Start with base query
     query = """
         SELECT
             gle.posting_date AS posting_date,
@@ -87,15 +79,12 @@ def get_data(filters):
             AND gle.posting_date BETWEEN %(from_date)s AND %(to_date)s
     """
     
-    # Add customer filter if specified
     if filters.get('customer'):
         query += " AND gle.party = %(customer)s"
         params['customer'] = filters.get('customer')
     
-    # Add ORDER BY
     query += " ORDER BY gle.posting_date ASC, gle.creation ASC"
     
-    # Execute query and return as list of dictionaries
     data = frappe.db.sql(query, params, as_dict=1)
     
     return data
