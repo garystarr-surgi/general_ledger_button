@@ -54,17 +54,9 @@ def execute(filters=None):
     if customer:
         params['customer'] = customer
     
-    # Define columns for the report
-    columns = [
-        "Posting Date:Date:120",
-        "Description:Data:200",
-        "Debit:Currency:120",
-        "Credit:Currency:120",
-        "Amount:Currency:120"
-    ]
-    
-    # Execute query
+    # Execute query - return as list of lists (rows)
+    # Columns are defined in the Report doctype, so we only return data
     data = frappe.db.sql(query, params, as_dict=0)
     
-    return columns, data
+    return data
 
