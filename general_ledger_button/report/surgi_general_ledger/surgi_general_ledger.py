@@ -83,8 +83,8 @@ def get_data(filters):
     if conditions:
         additional_conditions = "AND " + " AND ".join(conditions)
     
-    # Build the query
-    query = f"""
+    # Build the query - removed {conditions} placeholder
+    query = """
         SELECT
             gle.posting_date AS posting_date,
             CONCAT(gle.voucher_type, ' ', gle.voucher_no) AS description,
@@ -98,7 +98,7 @@ def get_data(filters):
             AND gle.posting_date BETWEEN %(from_date)s AND %(to_date)s
             {additional_conditions}
         ORDER BY gle.posting_date ASC, gle.creation ASC
-    """
+    """.format(additional_conditions=additional_conditions)
     
     # Execute query and return as list of dictionaries
     data = frappe.db.sql(query, params, as_dict=1)
