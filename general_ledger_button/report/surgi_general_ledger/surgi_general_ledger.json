@@ -2,32 +2,7 @@
  "allow_rename": 1,
  "creation": "2025-01-27 00:00:00.000000",
  "doctype": "Report",
- "filters": [
-  {
-   "default": "frappe.datetime.add_months(frappe.datetime.nowdate(), -1)",
-   "fieldname": "from_date",
-   "fieldtype": "Date",
-   "label": "From Date",
-   "mandatory": 1,
-   "wildcard": 0
-  },
-  {
-   "default": "frappe.datetime.nowdate()",
-   "fieldname": "to_date",
-   "fieldtype": "Date",
-   "label": "To Date",
-   "mandatory": 1,
-   "wildcard": 0
-  },
-  {
-   "fieldname": "customer",
-   "fieldtype": "Link",
-   "label": "Customer",
-   "mandatory": 0,
-   "options": "Customer",
-   "wildcard": 0
-  }
- ],
+ "filters": [],
  "is_standard": "No",
  "json": "",
  "modified": "2025-01-27 00:00:00.000000",
@@ -39,4 +14,3 @@
  "report_type": "Script Report",
  "roles": []
 }
-
