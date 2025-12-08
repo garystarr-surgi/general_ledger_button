@@ -67,23 +67,12 @@ def get_data(filters):
     Fetch report data
     """
     # Build WHERE conditions
-    conditions = []
     params = {
         'from_date': filters.get('from_date'),
         'to_date': filters.get('to_date')
     }
     
-    # Add customer filter if specified
-    if filters.get('customer'):
-        conditions.append("gle.party = %(customer)s")
-        params['customer'] = filters.get('customer')
-    
-    # Build additional WHERE clause
-    additional_conditions = ""
-    if conditions:
-        additional_conditions = "AND " + " AND ".join(conditions)
-    
-    # Build the query - removed {conditions} placeholder
+    # Start with base query
     query = """
         SELECT
             gle.posting_date AS posting_date,
@@ -96,9 +85,15 @@ def get_data(filters):
             gle.is_cancelled = 0
             AND gle.party_type = 'Customer'
             AND gle.posting_date BETWEEN %(from_date)s AND %(to_date)s
-            {additional_conditions}
-        ORDER BY gle.posting_date ASC, gle.creation ASC
-    """.format(additional_conditions=additional_conditions)
+    """
+    
+    # Add customer filter if specified
+    if filters.get('customer'):
+        query += " AND gle.party = %(customer)s"
+        params['customer'] = filters.get('customer')
+    
+    # Add ORDER BY
+    query += " ORDER BY gle.posting_date ASC, gle.creation ASC"
     
     # Execute query and return as list of dictionaries
     data = frappe.db.sql(query, params, as_dict=1)
