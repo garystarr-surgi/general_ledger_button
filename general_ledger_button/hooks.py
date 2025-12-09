@@ -8,7 +8,12 @@ app_color = "grey"
 app_email = "gary.starr@surgishop.com"
 app_license = "MIT"
 
+# Only load the print button JS globally
 app_include_js = [
-   # "/assets/general_ledger_button/js/surgi_general_ledger.js",
-    "/general_ledger_button/report/general_ledger_button/surgi_general_ledger.js"
+    "/assets/general_ledger_button/js/surgi_general_ledger_print_button.js"
+]
+
+# Include JS for report functionality
+app_include_js = [
+    "/assets/general_ledger_button/js/surgi_general_ledger_report.js"
 ]
