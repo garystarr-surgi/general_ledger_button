@@ -1,6 +1,5 @@
 import frappe
 from frappe import _
-from frappe.desk.query_report import run
 import json
 
 @frappe.whitelist()
@@ -15,36 +14,50 @@ def print_surgi_general_ledger(filters=None):
     if not filters.get('from_date') or not filters.get('to_date'):
         frappe.throw(_("From Date and To Date are required"))
     
-    # Get the report data
-    report_name = "Surgi General Ledger"
-    result = run(report_name, filters=filters)
+    if not filters.get('customer'):
+        frappe.throw(_("Please select a customer"))
     
-    # Create a document-like object that your print format can use
-    # This makes filter values accessible as doc.customer, doc.from_date, etc.
+    # Create a document-like object for the template
     doc = frappe._dict({
         "doctype": "Report",
-        "name": report_name,
-        "report_name": report_name,
+        "name": "Surgi General Ledger",
         "customer": filters.get("customer"),
         "from_date": filters.get("from_date"),
-        "to_date": filters.get("to_date"),
-        "data": result.get("result", []),
-        "columns": result.get("columns", [])
+        "to_date": filters.get("to_date")
     })
     
-    # Generate HTML using the print format
-    html = frappe.get_print(
-        doctype="Report",
-        name=report_name,
-        print_format="Surgi Customer Statement",
-        doc=doc,
-        no_letterhead=0
-    )
+    # Get the print format
+    print_format = frappe.get_doc("Print Format", "Surgi Customer Statement")
+    
+    # Render the Jinja template with the doc context
+    from frappe.utils.jinja import render_template
+    html = render_template(print_format.html, {"doc": doc, "frappe": frappe})
+    
+    # Add letterhead if specified
+    letterhead = None
+    if print_format.letter_head:
+        letterhead = frappe.get_doc("Letter Head", print_format.letter_head)
+    
+    # Wrap in standard print template
+    from frappe.www.printview import get_print_style
+    final_html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <style>{get_print_style()}</style>
+    </head>
+    <body>
+        {letterhead.content if letterhead else ''}
+        {html}
+    </body>
+    </html>
+    """
     
     # Convert to PDF
-    pdf = frappe.utils.pdf.get_pdf(html)
+    pdf = frappe.utils.pdf.get_pdf(final_html)
     
     # Return as downloadable file
-    frappe.local.response.filename = f"Customer_Statement_{filters.get('customer', 'All')}.pdf"
+    frappe.local.response.filename = f"Customer_Statement_{filters.get('customer')}.pdf"
     frappe.local.response.filecontent = pdf
     frappe.local.response.type = "pdf"
