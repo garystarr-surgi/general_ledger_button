@@ -54,8 +54,8 @@
         }
     }
     
-    // Try to add button when page loads
-    frappe.ready(function() {
+    // Try to add button when page loads - use multiple methods for compatibility
+    function initPrintButton() {
         // Try multiple times with increasing delays
         let attempts = [500, 1000, 2000, 3000];
         attempts.forEach(function(delay) {
@@ -65,16 +65,32 @@
                 }
             }, delay);
         });
+    }
+    
+    // Use jQuery ready (more compatible)
+    $(document).ready(function() {
+        initPrintButton();
     });
     
-    // Also listen for route changes
-    if (frappe.route && frappe.route.on) {
+    // Also use frappe.after_ajax if available (for AJAX-loaded pages)
+    if (typeof frappe !== 'undefined' && frappe.after_ajax) {
+        frappe.after_ajax(function() {
+            setTimeout(function() {
+                if (window.location.pathname.includes('query-report/Surgi General Ledger')) {
+                    addPrintButtonToReport();
+                }
+            }, 500);
+        });
+    }
+    
+    // Listen for route changes if available
+    if (typeof frappe !== 'undefined' && frappe.route && frappe.route.on) {
         frappe.route.on('change', function() {
             setTimeout(addPrintButtonToReport, 1000);
         });
     }
     
-    // Listen for report refresh
+    // Listen for report refresh events
     $(document).on('refresh', function() {
         setTimeout(addPrintButtonToReport, 500);
     });
