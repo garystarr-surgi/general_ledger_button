@@ -8,12 +8,9 @@ app_color = "grey"
 app_email = "gary.starr@surgishop.com"
 app_license = "MIT"
 
-# Only load the print button JS globally
+# Load the print button JS globally as a fallback
+# The report folder JS handles filters and also tries to add the button
+# This global JS ensures the button appears even if onload doesn't fire properly
 app_include_js = [
     "/assets/general_ledger_button/js/surgi_general_ledger_button.js"
-]
-
-# Include JS for report functionality
-app_include_js = [
-    "/assets/general_ledger_button/js/surgi_general_ledger_report.js"
 ]

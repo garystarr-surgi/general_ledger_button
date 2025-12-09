@@ -1,34 +1,81 @@
-// This file ONLY adds the print button
+// This file adds the print button as a fallback
 // Filters are handled by the report folder JS
-frappe.after_ajax(function() {
-    if (window.location.pathname.includes('query-report/Surgi General Ledger')) {
-        setTimeout(function() {
-            if (frappe.query_report && 
-                frappe.query_report.report_name === "Surgi General Ledger" && 
-                !frappe.query_report._print_button_added) {
+(function() {
+    'use strict';
+    
+    function addPrintButtonToReport() {
+        // Check if we're on the correct report page
+        if (!window.location.pathname.includes('query-report/Surgi General Ledger')) {
+            return false;
+        }
+        
+        // Check if report is available
+        if (!frappe.query_report || frappe.query_report.report_name !== "Surgi General Ledger") {
+            return false;
+        }
+        
+        // Check if button already added
+        if (frappe.query_report._print_button_added) {
+            return true;
+        }
+        
+        let report = frappe.query_report;
+        let page = report.page || (report.$page && report.$page[0]) || null;
+        
+        if (!page || typeof page.add_inner_button !== 'function') {
+            return false;
+        }
+        
+        try {
+            page.add_inner_button(__("Print Statement"), function() {
+                let filters = report.get_filter_values() || {};
+                let print_url = `/printview?doctype=Report&name=Surgi General Ledger&print_format=Surgi Customer Statement`;
                 
-                if (frappe.query_report.page && frappe.query_report.page.add_inner_button) {
-                    frappe.query_report.page.add_inner_button(__("Print Statement"), function() {
-                        let filters = frappe.query_report.get_filter_values() || {};
-                        let print_url = `/printview?doctype=Report&name=Surgi General Ledger&print_format=Surgi Customer Statement`;
-                        
-                        if (Object.keys(filters).length > 0) {
-                            let params = new URLSearchParams();
-                            Object.keys(filters).forEach(function(key) {
-                                if (filters[key]) {
-                                    params.append(key, filters[key]);
-                                }
-                            });
-                            if (params.toString()) {
-                                print_url += '&' + params.toString();
-                            }
+                if (Object.keys(filters).length > 0) {
+                    let params = new URLSearchParams();
+                    Object.keys(filters).forEach(function(key) {
+                        if (filters[key]) {
+                            params.append(key, filters[key]);
                         }
-                        
-                        window.open(print_url, '_blank');
                     });
-                    frappe.query_report._print_button_added = true;
+                    if (params.toString()) {
+                        print_url += '&' + params.toString();
+                    }
                 }
-            }
-        }, 2000);
+                
+                window.open(print_url, '_blank');
+            });
+            
+            frappe.query_report._print_button_added = true;
+            return true;
+        } catch (e) {
+            console.error("Error adding print button (global):", e);
+            return false;
+        }
     }
-});
+    
+    // Try to add button when page loads
+    frappe.ready(function() {
+        // Try multiple times with increasing delays
+        let attempts = [500, 1000, 2000, 3000];
+        attempts.forEach(function(delay) {
+            setTimeout(function() {
+                if (!frappe.query_report || !frappe.query_report._print_button_added) {
+                    addPrintButtonToReport();
+                }
+            }, delay);
+        });
+    });
+    
+    // Also listen for route changes
+    if (frappe.route && frappe.route.on) {
+        frappe.route.on('change', function() {
+            setTimeout(addPrintButtonToReport, 1000);
+        });
+    }
+    
+    // Listen for report refresh
+    $(document).on('refresh', function() {
+        setTimeout(addPrintButtonToReport, 500);
+    });
+})();
