@@ -9,6 +9,6 @@ app_email = "gary.starr@surgishop.com"
 app_license = "MIT"
 
 app_include_js = [
-    "/assets/general_ledger_button/js/surgi_general_ledger.js"
+    "/assets/general_ledger_button/js/surgi_general_ledger.js",
     "/general_ledger_button/report/general_ledger_button/surgi_general_ledger.js"
 ]
