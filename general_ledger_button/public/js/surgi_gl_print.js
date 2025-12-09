@@ -23,20 +23,24 @@
         if (frappe.query_report.page && frappe.query_report.page.add_inner_button) {
             frappe.query_report.page.add_inner_button(__("Print Statement"), function() {
                 let filters = frappe.query_report.get_filter_values() || {};
-                let print_url = `/printview?doctype=Report&name=Surgi General Ledger&print_format=Surgi Customer Statement`;
                 
+                // Build print URL with proper encoding
+                let params = new URLSearchParams();
+                params.append('doctype', 'Report');
+                params.append('name', 'Surgi General Ledger');
+                params.append('print_format', 'Surgi Customer Statement');
+                
+                // Add filter parameters
                 if (Object.keys(filters).length > 0) {
-                    let params = new URLSearchParams();
                     Object.keys(filters).forEach(function(key) {
                         if (filters[key]) {
                             params.append(key, filters[key]);
                         }
                     });
-                    if (params.toString()) {
-                        print_url += '&' + params.toString();
-                    }
                 }
                 
+                let print_url = '/printview?' + params.toString();
+                console.log("Print URL:", print_url);
                 window.open(print_url, '_blank');
             });
             
