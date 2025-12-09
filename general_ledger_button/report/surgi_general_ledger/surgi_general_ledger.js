@@ -48,4 +48,3 @@ frappe.query_reports["Surgi General Ledger"] = {
 		}, 1500);
 	}
 };
-
