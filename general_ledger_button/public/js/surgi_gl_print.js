@@ -24,14 +24,15 @@
             frappe.query_report.page.add_inner_button(__("Print Statement"), function() {
                 let filters = frappe.query_report.get_filter_values() || {};
                 
-                // Build the correct printview URL for the custom print format
-                let url = frappe.utils.get_url_to_print({
-                    report_name: "Surgi General Ledger",
-                    filters: filters,
-                    print_format: "Surgi Customer Statement"
-                });
+                // Build URL to download PDF using custom print format
+                let url = frappe.request.url + '/api/method/frappe.utils.print_format.download_pdf';
+                let params = new URLSearchParams();
+                params.append('report_name', "Surgi General Ledger");
+                params.append('filters', JSON.stringify(filters));
+                params.append('print_format', "Surgi Customer Statement");
+                params.append('file_format_type', 'PDF');
                 
-                window.open(url, "_blank");
+                window.open(url + '?' + params.toString(), '_blank');
             });
             
             frappe.query_report._print_button_added = true;
