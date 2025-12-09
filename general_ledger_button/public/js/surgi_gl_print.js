@@ -4,7 +4,7 @@
     
     function addPrintButton() {
         // Only run on the Surgi General Ledger report page
-        if (!window.location.pathname.includes('query-report/Surgi%20General%20Ledger') && 
+        if (!window.location.pathname.includes('query-report/Surgi%20General%20Ledger') &&
             !window.location.pathname.includes('query-report/Surgi General Ledger')) {
             return;
         }
@@ -24,12 +24,14 @@
             frappe.query_report.page.add_inner_button(__("Print Statement"), function() {
                 let filters = frappe.query_report.get_filter_values() || {};
                 
-                // Call our custom print method
-                let url = '/api/method/general_ledger_button.print_utils.print_surgi_general_ledger';
-                let params = new URLSearchParams();
-                params.append('filters', JSON.stringify(filters));
+                // Build the correct printview URL for the custom print format
+                let url = frappe.utils.get_url_to_print({
+                    report_name: "Surgi General Ledger",
+                    filters: filters,
+                    print_format: "Surgi Customer Statement"
+                });
                 
-                window.open(url + '?' + params.toString(), '_blank');
+                window.open(url, "_blank");
             });
             
             frappe.query_report._print_button_added = true;
