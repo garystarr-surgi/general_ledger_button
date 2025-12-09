@@ -1,45 +1,28 @@
-// This file adds the print button as a fallback
-// Filters are handled by the report folder JS
+// Add print button to Surgi General Ledger report
 (function() {
     'use strict';
     
-    // Wait for frappe and jQuery to be available
-    function waitForDependencies(callback) {
-        if (typeof frappe !== 'undefined' && typeof $ !== 'undefined') {
-            callback();
-        } else {
-            setTimeout(function() {
-                waitForDependencies(callback);
-            }, 100);
-        }
-    }
-    
-    function addPrintButtonToReport() {
-        // Check if we're on the correct report page
-        if (!window.location.pathname.includes('query-report/Surgi General Ledger')) {
-            return false;
+    function addPrintButton() {
+        // Only run on the Surgi General Ledger report page
+        if (!window.location.pathname.includes('query-report/Surgi%20General%20Ledger') && 
+            !window.location.pathname.includes('query-report/Surgi General Ledger')) {
+            return;
         }
         
-        // Check if frappe and report are available
-        if (typeof frappe === 'undefined' || !frappe.query_report || frappe.query_report.report_name !== "Surgi General Ledger") {
-            return false;
+        // Check if frappe.query_report exists
+        if (!frappe.query_report || frappe.query_report.report_name !== "Surgi General Ledger") {
+            return;
         }
         
         // Check if button already added
         if (frappe.query_report._print_button_added) {
-            return true;
+            return;
         }
         
-        let report = frappe.query_report;
-        let page = report.page || (report.$page && report.$page[0]) || null;
-        
-        if (!page || typeof page.add_inner_button !== 'function') {
-            return false;
-        }
-        
-        try {
-            page.add_inner_button(__("Print Statement"), function() {
-                let filters = report.get_filter_values() || {};
+        // Add the button
+        if (frappe.query_report.page && frappe.query_report.page.add_inner_button) {
+            frappe.query_report.page.add_inner_button(__("Print Statement"), function() {
+                let filters = frappe.query_report.get_filter_values() || {};
                 let print_url = `/printview?doctype=Report&name=Surgi General Ledger&print_format=Surgi Customer Statement`;
                 
                 if (Object.keys(filters).length > 0) {
@@ -58,58 +41,19 @@
             });
             
             frappe.query_report._print_button_added = true;
-            return true;
-        } catch (e) {
-            console.error("Error adding print button (global):", e);
-            return false;
+            console.log("Print button added successfully");
         }
     }
     
-    // Try to add button when page loads - use multiple methods for compatibility
-    function initPrintButton() {
-        // Try multiple times with increasing delays
-        let attempts = [500, 1000, 2000, 3000];
-        attempts.forEach(function(delay) {
-            setTimeout(function() {
-                if (typeof frappe !== 'undefined' && (!frappe.query_report || !frappe.query_report._print_button_added)) {
-                    addPrintButtonToReport();
-                }
-            }, delay);
-        });
-    }
-    
-    // Initialize when dependencies are ready
-    waitForDependencies(function() {
-        // Use jQuery ready (more compatible)
-        if (typeof $ !== 'undefined') {
-            $(document).ready(function() {
-                initPrintButton();
-            });
-        }
-        
-        // Also use frappe.after_ajax if available (for AJAX-loaded pages)
-        if (typeof frappe !== 'undefined' && frappe.after_ajax && typeof frappe.after_ajax === 'function') {
-            frappe.after_ajax(function() {
-                setTimeout(function() {
-                    if (window.location.pathname.includes('query-report/Surgi General Ledger')) {
-                        addPrintButtonToReport();
-                    }
-                }, 500);
-            });
-        }
-        
-        // Listen for route changes if available
-        if (typeof frappe !== 'undefined' && frappe.route && frappe.route.on && typeof frappe.route.on === 'function') {
-            frappe.route.on('change', function() {
-                setTimeout(addPrintButtonToReport, 1000);
-            });
-        }
-        
-        // Listen for report refresh events
-        if (typeof $ !== 'undefined') {
-            $(document).on('refresh', function() {
-                setTimeout(addPrintButtonToReport, 500);
-            });
-        }
+    // Try to add button on page load
+    $(document).ready(function() {
+        setTimeout(addPrintButton, 1500);
+        setTimeout(addPrintButton, 3000);
     });
+    
+    // Also try after AJAX calls (for single-page navigation)
+    frappe.after_ajax(function() {
+        setTimeout(addPrintButton, 1000);
+    });
+    
 })();
