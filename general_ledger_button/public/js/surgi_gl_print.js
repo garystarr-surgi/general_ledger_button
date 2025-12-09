@@ -25,7 +25,7 @@
                 let filters = frappe.query_report.get_filter_values() || {};
                 
                 // Build URL to download PDF using custom print format
-                let url = frappe.request.url + '/api/method/frappe.utils.print_format.download_pdf';
+                let url = '/api/method/frappe.utils.print_format.download_pdf';
                 let params = new URLSearchParams();
                 params.append('report_name', "Surgi General Ledger");
                 params.append('filters', JSON.stringify(filters));
@@ -52,3 +52,4 @@
     });
     
 })();
+
