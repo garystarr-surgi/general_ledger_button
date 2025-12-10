@@ -11,6 +11,6 @@ app_license = "MIT"
 # Load the print button JS globally as a fallback
 # The report folder JS handles filters and also tries to add the button
 # This global JS ensures the button appears even if onload doesn't fire properly
-# app_include_js = [
-#    "/assets/general_ledger_button/js/surgi_gl_print.js"
-# ]
+app_include_js = [
+   "/assets/general_ledger_button/js/surgi_gl_print.js"
+]
