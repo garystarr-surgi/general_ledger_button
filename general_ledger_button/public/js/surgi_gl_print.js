@@ -30,11 +30,16 @@
                 }
                 
                 // Create a Customer Statement doc and print it
+                // Generate a unique name using timestamp
+                let timestamp = frappe.datetime.now_datetime().replace(/[:\s-]/g, '');
+                let doc_name = `STMT-${filters.customer}-${timestamp}`;
+                
                 frappe.call({
                     method: 'frappe.client.insert',
                     args: {
                         doc: {
                             doctype: 'Customer Statement',
+                            __newname: doc_name,
                             customer: filters.customer,
                             from_date: filters.from_date,
                             to_date: filters.to_date,
